@@ -1,0 +1,39 @@
+%{
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+int comments = 0, keywords = 0, identifiers = 0;
+int words = 0, lines = 0, spaces = 0;
+%}
+
+%%
+"//".*                  { comments++; }
+"/*"([^*]|\*+[^*/])*\*+"/" { comments++; }
+"int"|"char"|"float"|"double"|"if"|"else"|"for"|"while"|"return"|"void"
+                        { keywords++; words++; }
+[A-Za-z_][A-Za-z0-9_]*  { identifiers++; words++; }
+[0-9]+                  { words++; }
+" "                     { spaces++; }
+\t                      { spaces++; }
+\n                      { lines++; }
+.                       { }
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    printf("Enter C code (Ctrl+D to finish):\n");
+    yylex();
+
+    printf("\nComments: %d", comments);
+    printf("\nKeywords: %d", keywords);
+    printf("\nIdentifiers: %d", identifiers);
+    printf("\nWords: %d", words);
+    printf("\nLines: %d", lines);
+    printf("\nSpaces: %d\n", spaces);
+
+    return 0;
+}
