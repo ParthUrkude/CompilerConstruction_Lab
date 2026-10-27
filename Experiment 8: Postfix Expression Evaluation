@@ -1,0 +1,49 @@
+%{
+#include "exp8.tab.h"
+#include <stdlib.h>
+%}
+
+%%
+[0-9]+      { yylval = atoi(yytext); return NUMBER; }
+[ \t\n]+    ;
+[+*/-]      { return yytext[0]; }
+.           { return yytext[0]; }
+%%
+
+int yywrap() { return 1; }
+
+---------------------------------------------------------
+
+%{
+#include <stdio.h>
+int yylex(void);
+void yyerror(const char *s);
+%}
+
+%token NUMBER
+
+%%
+input: expr { printf("Result = %d\n", $1); }
+     ;
+
+expr: NUMBER
+    | expr expr '+' { $$ = $1 + $2; }
+    | expr expr '-' { $$ = $1 - $2; }
+    | expr expr '*' { $$ = $1 * $2; }
+    | expr expr '/' {
+          if ($2 == 0) {
+              yyerror("Division by zero");
+              $$ = 0;
+          } else $$ = $1 / $2;
+      }
+    ;
+%%
+
+void yyerror(const char *s) {
+    printf("Error: %s\n", s);
+}
+
+int main() {
+    printf("Enter postfix expression, e.g. 5 2 +:\n");
+    return yyparse();
+}
