@@ -1,0 +1,21 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+%}
+
+%%
+[0-9]+ {
+    printf("0x%lX", strtoul(yytext, NULL, 10));
+}
+.|\n {
+    ECHO;
+}
+%%
+
+int yywrap() { return 1; }
+
+int main() {
+    printf("Enter decimal numbers:\n");
+    yylex();
+    return 0;
+}
